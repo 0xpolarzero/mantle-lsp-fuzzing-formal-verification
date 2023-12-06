@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// echidna src/Invariants.sol --contract Invariants --config echidna-config.yaml
+/// @dev Run the fuzzing campaign:
+/// echidna src/Invariants.sol --contract Invariants --config echidna-config.yaml
+
+/// @dev This contract inherits from the handler contracts, trusted to make calls to the target contracts.
+/// Here, we basically:
+/// - set up the configuration for the test suite;
+/// - keep track of balances (for both native ETH and mETH);
+/// - (try to) verify the invariants.
 
 // Utils
 import {hevm} from "utils/HEVM.sol";
@@ -19,7 +26,7 @@ contract Invariants is StakingHandler {
     address constant METH_PROXY = 0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa;
     address constant UNSTAKE_REQUESTS_MANAGER_PROXY = 0x38fDF7b489316e03eD8754ad339cb5c4483FDcf9;
 
-    // Keep track of balances
+    /// @dev Keep track of balances
     uint256 initialMETHBalance;
     // The ETH that we own (sent from the fuzzer in the constructor & fallback)
     uint256 initialETHBalance;
@@ -29,7 +36,7 @@ contract Invariants is StakingHandler {
     int256 ethStaked;
 
     constructor() payable StakingHandler(STAKING_PROXY, METH_PROXY, UNSTAKE_REQUESTS_MANAGER_PROXY) {
-        // Navigate to the desired fork block
+        // Fork the desired block, and use it as a starting point
         hevm.roll(18714518);
 
         // Initialize balances
@@ -44,25 +51,29 @@ contract Invariants is StakingHandler {
     /*                                  OVERRIDES                                 */
     /* -------------------------------------------------------------------------- */
 
+    /// @dev Call `stake` in the handler, and keep track of the ETH staked
     function stake(uint256 _amount) public payable override {
         super.stake(_amount);
         ethStaked += int256(msg.value);
     }
 
     fallback() external payable {
-        _onReceiveETH(msg.value);
+        _onReceiveETH();
     }
 
     receive() external payable {
-        _onReceiveETH(msg.value);
+        _onReceiveETH();
     }
 
+    /// @dev Invariant: try to get the most optimized profit from a transactions sequence
+    /// Note: We basically substract the initial ETH and mETH balances from the current ones,
+    /// as well as the staked ETH.
     function echidna_optimize_extracted_profit() public view returns (int256 profit) {
-        // Get balances
+        // Get current balances
         int256 balanceETH = int256(address(this).balance);
         uint256 balanceMETH = METH(METH_PROXY).balanceOf(address(this));
 
-        // Calculate the equivalent of mETH in ETH
+        // Calculate the equivalent of mETH in ETH, to be able to calculate with the same base
         int256 balanceMETHConverted = int256(Staking(payable(STAKING_PROXY)).mETHToETH(balanceMETH));
         int256 initialMETHBalanceConverted = int256(Staking(payable(STAKING_PROXY)).mETHToETH(initialMETHBalance));
 
@@ -77,12 +88,12 @@ contract Invariants is StakingHandler {
     /*                                   HELPERS                                  */
     /* -------------------------------------------------------------------------- */
 
-    function _onReceiveETH(uint256 _amount) internal {
+    function _onReceiveETH() internal {
         // If echidna is calling this function with ETH, it's our own
         if (_isSenderFuzzer()) {
             initialETHBalance += msg.value;
         } else {
-            // Otherwise, we're either receiving ETH back from staking, or from an issue
+            // Otherwise, we're either receiving ETH back from staking, or from anything else (which is unexpected)
             ethStaked -= int256(msg.value);
         }
     }
