@@ -2,6 +2,8 @@
 
 A simple echidna fuzzing operation of the Mantle staking contract, with `optimization` mode, to try to extract as much `mETH` as possible.
 
+https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/
+
 1. Get the interfaces for the contracts ([see below](#generate-an-interface-from-the-on-chain-contract))
 
 2. Create an `echidna-config.yaml` file, and populate it with the right values (see `echidna-config.example.yaml`)
@@ -17,6 +19,11 @@ A simple echidna fuzzing operation of the Mantle staking contract, with `optimiz
 
 - [Proxy](https://etherscan.io/address/0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa)
 - [Implementation](https://etherscan.io/address/0xc9173bf8bd5c1b071b5cae4122202a347b7eefab)
+
+### UnstakeRequestsManager
+
+- [Proxy](https://etherscan.io/address/0x38fDF7b489316e03eD8754ad339cb5c4483FDcf9)
+- [Implementation](https://etherscan.io/address/0x5a7b3cde8ac8d780af4797bf1517464ac54ca033)
 
 ## Generate an interface from the on-chain contract
 
