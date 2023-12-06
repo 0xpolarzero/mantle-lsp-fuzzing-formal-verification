@@ -1,2 +1,6 @@
 # Echidna config
 echidna-config.yaml
+
+# Cache/output
+echidna-corpus
+crytic-export
