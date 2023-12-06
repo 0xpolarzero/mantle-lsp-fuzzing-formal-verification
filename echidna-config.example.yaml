@@ -1,0 +1,5 @@
+testMode: optimization # echidna will try to extract the highest possible value in the invariant
+testLimit: 1000000 # echidna will run for 1,000,000 transactions
+corpusDir: echidna-corpus # the directory where echidna will store the corpus
+rpcUrl: https://eth-mainnet... # the rpc url to use
+rpcBlock: 18714518 # the block to fork the contracts and fetch values at

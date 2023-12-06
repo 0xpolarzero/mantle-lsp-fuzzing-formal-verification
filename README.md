@@ -4,6 +4,8 @@ A simple echidna fuzzing operation of the Mantle staking contract, with `optimiz
 
 1. Get the interfaces for the contracts ([see below](#generate-an-interface-from-the-on-chain-contract))
 
+2. Create an `echidna-config.yaml` file, and populate it with the right values (see `echidna-config.example.yaml`)
+
 ## Contract addresses (2023-12-06)
 
 ### Staking
