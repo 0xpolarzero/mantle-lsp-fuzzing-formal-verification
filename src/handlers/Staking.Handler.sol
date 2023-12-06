@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/// @dev This handler makes call to the `Staking` contract, with random yet tailored values,
+/// in an attempt to tire out the contract, and get it to behave in an unexpected way.
+
+/// @dev Here we basically only use external functions that are not notably restricted.
+/// @dev We could call these restricted functions as well if we wanted to test the correctness of
+/// the roles management, but it's not the purpose here.
+
 // Interfaces
 import {Staking} from "interfaces/IStaking.sol";
 import {METH} from "interfaces/ImETH.sol";
@@ -9,13 +16,13 @@ import {UnstakeRequestsManager} from "interfaces/IUnstakeRequestsManager.sol";
 contract StakingHandler {
     Staking staking;
     METH mETH;
-
     UnstakeRequestsManager unstakeRequestsManager;
 
+    /// @dev The unfulfilled unstake requests (basically `Staking.unstakeRequest` but not yet `Staking.claimUnstakeRequest`)
     uint256[] unstakeRequestsIds;
 
+    /// @dev Initialize the contracts used in the handler, at the given addresses on mainnet
     constructor(address _staking, address _mETH, address _unstakeRequestsManager) {
-        // Initialize contracts at the given proxies
         staking = Staking(payable(_staking));
         mETH = METH(_mETH);
         unstakeRequestsManager = UnstakeRequestsManager(payable(_unstakeRequestsManager));
@@ -25,31 +32,33 @@ contract StakingHandler {
     /*                                  FUNCTIONS                                 */
     /* -------------------------------------------------------------------------- */
 
-    // Here we basically only use external functions that are not notably restricted.
-    // We could call them as well if we wanted to test the correctness of the roles management,
-    // but it's not the case here.
-
+    /**
+     * @dev Stake ETH in the `Staking` contract, and receive mETH in return
+     * Note: We need to give a minMETHAmount that is appropriate relative to the amount of ETH we send.
+     * However, we don't want to fit too much to the expected scenario.
+     * So we just either send random values, or loosely crafted values.
+     */
     function stake(uint256 _amount) public payable virtual {
-        // We need to give a minMETHAmount that is appropriate relative to the amount of ETH we send
-        // However, we don't want to fit too much to the expected scenario
-        // So we just either send random values, or loosely crafted values
         bool random = _randomize(_amount);
         uint256 minMETHAmount = staking.ethToMETH(msg.value);
 
         staking.stake{value: msg.value}(random ? _amount : minMETHAmount);
     }
 
+    /**
+     * @dev Make a request to unstake mETH from the `Staking` contract, which is usually followed by the
+     * actual claim of the unstake request
+     * Note: This will call `UnstakeRequestsManager.create`; which will try to transfer the mETHAmount
+     * from `msg.sender` to the `UnstakeRequestsManager` contract.
+     * Later, we want to call `Staking.claimUnstakeRequest`, which will call `UnstakeRequestsManager.claim`...
+     * -> which will fail if (request.cumulativeETHRequested > allocatedETHForClaims).
+     * -- (request.cumulativeETHRequested = latestCumulativeETHRequested + ethRequested)
+     * -- (ethRequested = _minETHAmount)
+     */
     function unstakeRequest(uint256 _seed) public virtual {
-        // This will call UnstakeRequestsManager.create
-        // which will try to transfer the mETHAmount from msg.sender to the UnstakeRequestsManager
-
-        // Later, we want to call Staking.claimUnstakeRequest, which will call UnstakeRequestsManager.claim
-        // -> this will fail if if (request.cumulativeETHRequested > allocatedETHForClaims)
-        // -- request.cumulativeETHRequested = latestCumulativeETHRequested + ethRequested (_minETHAmount)
-
-        // Calculate the amount of mETH we can unstake (will be burned in claimUnstakeRequest)
-        // uint128 mETHAmount = uint128(_seed % mETH.balanceOf(msg.sender) + 1);
+        // Calculate the amount of mETH we can unstake (will be burned in `claimUnstakeRequest`)
         uint128 mETHAmount = uint128(_clampBetween(_seed, 0, mETH.balanceOf(msg.sender)));
+
         // Calculate the appropriate amount of ETH to request
         uint256 maximumETHAmount =
             unstakeRequestsManager.allocatedETHForClaims() - unstakeRequestsManager.latestCumulativeETHRequested();
@@ -59,25 +68,25 @@ contract StakingHandler {
 
         uint256 requestId = staking.unstakeRequest(mETHAmount, ETHAmount);
 
-        // Keep track of the unstake request
+        // Keep track of the unstake request in a mirror
         unstakeRequestsIds.push(requestId);
     }
 
+    /**
+     * @dev Claim an unstake request, which will burn the mETH and send the ETH back to the requester
+     * Note: This will call `UnstakeRequestsManager.claim`.
+     * We actually need to own the requested id, otherwise it will fail, which means, we need to be the `request.requester`.
+     * This is not the case if it is owned by someone else, or if it's been claimed already (deleted).
+     */
     function claimUnstakeRequest(uint256 _seed) public virtual {
-        // This will call UnstakeRequestsManager.claim
-        // We actually need to own the requested id, otherwise it will fail, which means, be the request.requester
-        // This is not the case if it is owned by someone else, or if it's been claimed already (deleted)
         if (unstakeRequestsIds.length == 0) return;
         uint256 id = unstakeRequestsIds[_seed % unstakeRequestsIds.length];
 
         staking.claimUnstakeRequest(id);
 
-        // Delete the request
+        // Delete the request from the mirror
         _deleteUnstakeRequest(_seed % unstakeRequestsIds.length);
     }
-
-    // For other handler
-    // initiateValidatorWithDeposits
 
     /* -------------------------------------------------------------------------- */
     /*                                   HELPERS                                  */
