@@ -2,11 +2,15 @@
 
 A simple echidna fuzzing operation of the Mantle staking contract, with `optimization` mode, to try to extract as much `mETH` as possible.
 
-https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/
+See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/) for reference.
 
-1. Get the interfaces for the contracts ([see below](#generate-an-interface-from-the-on-chain-contract))
+## Running fuzzing tests
 
-2. Create an `echidna-config.yaml` file, and populate it with the right values (see `echidna-config.example.yaml`)
+...
+
+## Tips
+
+- [Get the interfaces for the contracts](#generate-an-interface-from-the-on-chain-contract)
 
 ## Contract addresses (2023-12-06)
 
@@ -27,10 +31,10 @@ https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/
 
 ## Generate an interface from the on-chain contract
 
-There are probably more efficient ways than this, but this works fine. Take this example from the `mETH` contract:
+There are probably more efficient ways than this, but the following works fine.
 
-1. [Navigate to the contract on Etherscan](https://etherscan.io/address/0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa#code)
+1. Navigate to the contract on Etherscan
 
-2. Read as proxy, copy [the implementation address (2023-12-06)](https://etherscan.io/address/0xc9173bf8bd5c1b071b5cae4122202a347b7eefab#code)
+2. Read as proxy, copy the implementation address
 
 3. Run Foundry `cast interface -n METH -o interfaces/ImETH.sol <IMPLEMENTATION_ADDRESS>`
