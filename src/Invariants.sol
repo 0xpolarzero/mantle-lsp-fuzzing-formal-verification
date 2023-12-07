@@ -16,15 +16,19 @@ import {hevm} from "utils/HEVM.sol";
 // Interfaces
 import {Staking} from "interfaces/IStaking.sol";
 import {METH} from "interfaces/ImETH.sol";
+import {DepositContract} from "interfaces/IDepositContract.sol";
 
 // Handlers
 import {StakingHandler} from "src/handlers/Staking.Handler.sol";
+import {ValidatorHandler} from "src/handlers/Validator.Handler.sol";
 
-contract Invariants is StakingHandler {
+contract Invariants is StakingHandler, ValidatorHandler {
     // Addresses of the proxies
     address constant STAKING_PROXY = payable(0xe3cBd06D7dadB3F4e6557bAb7EdD924CD1489E8f);
     address constant METH_PROXY = 0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa;
     address constant UNSTAKE_REQUESTS_MANAGER_PROXY = 0x38fDF7b489316e03eD8754ad339cb5c4483FDcf9;
+    // Address of the Eth2.0 deposit contract
+    address constant DEPOSIT_CONTRACT = 0x00000000219ab540356cBB839Cbe05303d7705Fa;
 
     /// @dev Keep track of balances
     uint256 initialMETHBalance;
@@ -35,7 +39,11 @@ contract Invariants is StakingHandler {
     // which might, depending on the scale, indicate an issue
     int256 ethStaked;
 
-    constructor() payable StakingHandler(STAKING_PROXY, METH_PROXY, UNSTAKE_REQUESTS_MANAGER_PROXY) {
+    constructor()
+        payable
+        StakingHandler(STAKING_PROXY, METH_PROXY, UNSTAKE_REQUESTS_MANAGER_PROXY)
+        ValidatorHandler(STAKING_PROXY, DEPOSIT_CONTRACT)
+    {
         // Fork the desired block, and use it as a starting point
         hevm.roll(18714518);
 
