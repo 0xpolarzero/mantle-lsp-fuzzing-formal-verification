@@ -1,6 +1,8 @@
-# fuzzing-mantle-lsp
+# Fuzzing Mantle LSP with Echidna
 
-A simple echidna fuzzing operation of the Mantle staking contract, with `optimization` mode, to try to extract as much `mETH` as possible.
+A simple Echidna fuzzing campaign directly over the deployed Mantle staking contract, with `optimization` mode, to try to extract as much `mETH` as possible.
+
+Basically, it will fuzz the staking contract with semi-random inputs, and initiate (mock) validators whenever there is a multiple of 32 ETH staked. All this, while the invariant tries to get the highest possible combined `ETH` and `mETH` balance.
 
 See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/) for reference.
 
