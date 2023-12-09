@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 /// @dev Run the fuzzing campaign:
-/// echidna src/Invariants.sol --contract Invariants --config echidna-config.yaml
+/// echidna test/Invariants.sol --contract Invariants --config echidna-config.yaml
 
 /// @dev This contract inherits from the handler contracts, trusted to make calls to the target contracts.
 /// Here, we basically:
@@ -19,8 +19,8 @@ import {METH} from "echidna/interfaces/ImETH.sol";
 import {DepositContract} from "echidna/interfaces/IDepositContract.sol";
 
 // Handlers
-import {StakingHandler} from "echidna/src/handlers/Staking.Handler.sol";
-import {ValidatorHandler} from "echidna/src/handlers/Validator.Handler.sol";
+import {StakingHandler} from "echidna/test/handlers/Staking.Handler.sol";
+import {ValidatorHandler} from "echidna/test/handlers/Validator.Handler.sol";
 
 contract Invariants is StakingHandler, ValidatorHandler {
     // Addresses of the proxies

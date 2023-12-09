@@ -10,7 +10,7 @@ See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-cont
 
 2. Rename `echidna-config.yaml.example` to `echidna-config.yaml` and fill in the values.
 
-3. Run (from this root) `echidna src/Invariants.sol --contract Invariants --config echidna-config.yaml`
+3. Run (from this root) `echidna test/Invariants.sol --contract Invariants --config echidna-config.yaml`
 
 ## Tips
 
