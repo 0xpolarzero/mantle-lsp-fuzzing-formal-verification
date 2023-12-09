@@ -23,11 +23,11 @@ pragma solidity ^0.8.20;
 /// by sending these to the beacon chain deposit contract.
 
 // Utils
-import {hevm} from "echidna/utils/HEVM.sol";
+import {hevm} from "fuzzing/echidna/utils/HEVM.sol";
 
 // Interfaces
-import {Staking} from "echidna/interfaces/IStaking.sol";
-import {DepositContract} from "echidna/interfaces/IDepositContract.sol";
+import {Staking} from "fuzzing/echidna/interfaces/IStaking.sol";
+import {DepositContract} from "fuzzing/echidna/interfaces/IDepositContract.sol";
 
 /// @dev Utility struct for the `_validatorParams` function
 struct Signature {

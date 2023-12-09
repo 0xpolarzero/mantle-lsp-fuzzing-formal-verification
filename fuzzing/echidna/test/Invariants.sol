@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @dev Run the fuzzing campaign:
+/// @dev Run the fuzzing campaign (from fuzzing/echidna):
 /// echidna test/Invariants.sol --contract Invariants --config echidna-config.yaml
 
 /// @dev This contract inherits from the handler contracts, trusted to make calls to the target contracts.
@@ -11,16 +11,16 @@ pragma solidity ^0.8.20;
 /// - (try to) verify the invariants.
 
 // Utils
-import {hevm} from "echidna/utils/HEVM.sol";
+import {hevm} from "fuzzing/echidna/utils/HEVM.sol";
 
 // Interfaces
-import {Staking} from "echidna/interfaces/IStaking.sol";
-import {METH} from "echidna/interfaces/ImETH.sol";
-import {DepositContract} from "echidna/interfaces/IDepositContract.sol";
+import {Staking} from "fuzzing/echidna/interfaces/IStaking.sol";
+import {METH} from "fuzzing/echidna/interfaces/ImETH.sol";
+import {DepositContract} from "fuzzing/echidna/interfaces/IDepositContract.sol";
 
 // Handlers
-import {StakingHandler} from "echidna/test/handlers/Staking.Handler.sol";
-import {ValidatorHandler} from "echidna/test/handlers/Validator.Handler.sol";
+import {StakingHandler} from "fuzzing/echidna/test/handlers/Staking.Handler.sol";
+import {ValidatorHandler} from "fuzzing/echidna/test/handlers/Validator.Handler.sol";
 
 contract Invariants is StakingHandler, ValidatorHandler {
     // Addresses of the proxies
