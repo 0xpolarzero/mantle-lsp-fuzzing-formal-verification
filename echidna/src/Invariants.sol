@@ -11,16 +11,16 @@ pragma solidity ^0.8.20;
 /// - (try to) verify the invariants.
 
 // Utils
-import {hevm} from "utils/HEVM.sol";
+import {hevm} from "echidna/utils/HEVM.sol";
 
 // Interfaces
-import {Staking} from "interfaces/IStaking.sol";
-import {METH} from "interfaces/ImETH.sol";
-import {DepositContract} from "interfaces/IDepositContract.sol";
+import {Staking} from "echidna/interfaces/IStaking.sol";
+import {METH} from "echidna/interfaces/ImETH.sol";
+import {DepositContract} from "echidna/interfaces/IDepositContract.sol";
 
 // Handlers
-import {StakingHandler} from "src/handlers/Staking.Handler.sol";
-import {ValidatorHandler} from "src/handlers/Validator.Handler.sol";
+import {StakingHandler} from "echidna/src/handlers/Staking.Handler.sol";
+import {ValidatorHandler} from "echidna/src/handlers/Validator.Handler.sol";
 
 contract Invariants is StakingHandler, ValidatorHandler {
     // Addresses of the proxies
