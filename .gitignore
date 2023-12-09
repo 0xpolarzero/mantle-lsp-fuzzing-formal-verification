@@ -4,3 +4,12 @@ echidna-config.yaml
 # Cache/output
 echidna-corpus
 crytic-export
+
+# ------------------------------
+
+# Certora
+.certora_internal
+
+# ------------------------------
+
+.DS_Store
