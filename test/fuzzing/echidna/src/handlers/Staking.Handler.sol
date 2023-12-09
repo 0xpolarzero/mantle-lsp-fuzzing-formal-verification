@@ -9,9 +9,9 @@ pragma solidity ^0.8.20;
 /// the roles management, but it's not the purpose here.
 
 // Interfaces
-import {Staking} from "fuzzing/echidna/interfaces/IStaking.sol";
-import {METH} from "fuzzing/echidna/interfaces/ImETH.sol";
-import {UnstakeRequestsManager} from "fuzzing/echidna/interfaces/IUnstakeRequestsManager.sol";
+import {Staking} from "test/fuzzing/echidna/interfaces/IStaking.sol";
+import {METH} from "test/fuzzing/echidna/interfaces/ImETH.sol";
+import {UnstakeRequestsManager} from "test/fuzzing/echidna/interfaces/IUnstakeRequestsManager.sol";
 
 contract StakingHandler {
     Staking staking;

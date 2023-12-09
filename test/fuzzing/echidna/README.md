@@ -14,7 +14,7 @@ See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-cont
 
 2. Rename `echidna-config.yaml.example` to `echidna-config.yaml` and fill in the values.
 
-3. Run (from `fuzzing/echidna/`) `echidna test/Invariants.sol --contract Invariants --config echidna-config.yaml`
+3. Run (from root) `echidna test/fuzzing/echidna/src/Staking.Invariants.sol --contract StakingInvariantsEchidna --config test/fuzzing/echidna/echidna-config.yaml`
 
 ## Tips
 
