@@ -4,6 +4,8 @@ A simple Echidna fuzzing campaign directly over the deployed Mantle staking cont
 
 Basically, it will fuzz the staking contract with semi-random inputs, and initiate (mock) validators whenever there is a multiple of 32 ETH staked. All this, while the invariant tries to get the highest possible combined `ETH` and `mETH` balance.
 
+_Please let me know if you find any mistake or inconsistency within the tests._
+
 See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/) for reference.
 
 ## Running fuzz/invariants tests
