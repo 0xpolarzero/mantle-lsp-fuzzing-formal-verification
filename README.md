@@ -4,9 +4,13 @@ A simple echidna fuzzing operation of the Mantle staking contract, with `optimiz
 
 See [this article](https://blog.trailofbits.com/2023/07/21/fuzzing-on-chain-contracts-with-echidna/) for reference.
 
-## Running fuzzing tests
+## Running fuzz/invariants tests
 
-...
+1. [Install Echidna](https://github.com/crytic/echidna#installation).
+
+2. Rename `echidna-config.yaml.example` to `echidna-config.yaml` and fill in the values.
+
+3. Run `echidna src/Invariants.sol --contract Invariants --config echidna-config.yaml`
 
 ## Tips
 
