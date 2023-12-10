@@ -1,3 +1,9 @@
+# Foundry
+out
+cache
+
+# ------------------------------
+
 # Echidna config
 echidna-config.yaml
 
