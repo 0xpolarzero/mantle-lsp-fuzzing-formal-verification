@@ -4,6 +4,9 @@ pragma solidity ^0.8.20;
 /// @dev The following will do virtually the same as Echidna invariant tests, that's why
 /// it inherits from its handlers. Except that we try to run it with no guidance.
 
+/// @dev Run with:
+/// medusa --config test/fuzzing/medusa/config.json fuzz
+
 import {StakingBaseMedusa} from "test/fuzzing/medusa/Staking.Base.sol";
 
 import {StakingHandler} from "test/fuzzing/echidna/src/handlers/Staking.Handler.sol";
@@ -68,7 +71,7 @@ contract StakingInvariantsMedusa is StakingBaseMedusa, StakingHandler, Validator
     /// @dev Invariant: try to get the most optimized profit from a transactions sequence
     /// Note: We basically substract the initial ETH and mETH balances from the current ones,
     /// as well as the staked ETH.
-    function fuzz_optimize_extracted_profit() public view returns (int256 profit) {
+    function optimize_extracted_profit() public view returns (int256 profit) {
         // Get current balances
         int256 balanceETH = int256(address(this).balance);
         uint256 balanceMETH = mETH.balanceOf(address(this));
