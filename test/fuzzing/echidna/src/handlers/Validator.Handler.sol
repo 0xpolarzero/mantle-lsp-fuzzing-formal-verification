@@ -1,16 +1,3 @@
-// Whenever there is 32 ETH or more
-// => allocateETH(uint256 allocateToUnstakeRequestsManager, uint256 allocateToDeposits)
-// -- allocateToUnstakeRequestsManager = 0
-// -- allocateToDeposits = balance - (balance % 32)
-// -! onlyRole(ALLOCATOR_SERVICE_ROLE)
-// => initiateValidatorsWithDeposits(ValidatorParams[] calldata validators, bytes32 expectedDepositRoot)
-// -- validators = [ValidatorParams(address validator, uint256 amount, uint256 withdrawalCredentials)]
-// -- expectedDepositRoot = 0x
-// -! onlyRole(INITIATOR_SERVICE_ROLE)
-
-// depositContract: 0x00000000219ab540356cBB839Cbe05303d7705Fa
-// bytes32 actualRoot = depositContract.get_deposit_root();
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -36,35 +23,33 @@ struct Signature {
 }
 
 contract ValidatorHandler {
-    DepositContract depositContract;
-    address payable STAKING;
+    DepositContract _depositContract;
+    Staking _staking;
 
     /// @dev The amount deposited when initiating validators
     uint256 constant DEPOSIT_AMOUNT = 32 ether;
     /// @dev The prefix for the withdrawal credentials
     bytes1 constant ETH1_ADDRESS_WITHDRAWAL_PREFIX = 0x01;
     /// @dev The withdrawal wallet
-    address withdrawalWallet;
+    address _withdrawalWallet;
 
     /// @dev The addresses the are trusted with special roles for allocating and initiating validators
-    address allocatorService;
-    address initiatorService;
+    address _allocatorService;
+    address _initiatorService;
 
     /// @dev The ETH were allocated, so it's ready to be used for initiating validators
     bool allocatedETHForDeposits;
 
     /// @dev Initialize the contracts used in the handler, at the given addresses on mainnet
-    constructor(address _staking, address _depositContract) {
-        STAKING = payable(_staking);
-        depositContract = DepositContract(_depositContract);
-
-        Staking stakingContract = Staking(payable(_staking));
+    constructor(address _stakingAddress, address _depositContractAddress) {
+        _staking = Staking(payable(_stakingAddress));
+        _depositContract = DepositContract(_depositContractAddress);
 
         // Initialize roles
-        allocatorService = stakingContract.getRoleMember(stakingContract.ALLOCATOR_SERVICE_ROLE(), 0);
-        initiatorService = stakingContract.getRoleMember(stakingContract.INITIATOR_SERVICE_ROLE(), 0);
+        _allocatorService = _staking.getRoleMember(_staking.ALLOCATOR_SERVICE_ROLE(), 0);
+        _initiatorService = _staking.getRoleMember(_staking.INITIATOR_SERVICE_ROLE(), 0);
         // and withdrawal wallet
-        withdrawalWallet = stakingContract.withdrawalWallet();
+        _withdrawalWallet = _staking.withdrawalWallet();
     }
 
     /* -------------------------------------------------------------------------- */
@@ -72,7 +57,7 @@ contract ValidatorHandler {
     /* -------------------------------------------------------------------------- */
 
     modifier enoughETHToInitiateValidators() {
-        require(STAKING.balance >= 32 ether, "ValidatorHandler: not enough ETH to initiate validators");
+        require(address(_staking).balance >= 32 ether, "ValidatorHandler: not enough ETH to initiate validators");
         _;
     }
 
@@ -82,10 +67,10 @@ contract ValidatorHandler {
      */
     function allocateETH() public virtual enoughETHToInitiateValidators {
         // Calculate the amount that can be allocated (in 32 ETH chunks)
-        uint256 amount = STAKING.balance - (STAKING.balance % DEPOSIT_AMOUNT);
+        uint256 amount = address(_staking).balance - (address(_staking).balance % DEPOSIT_AMOUNT);
 
-        hevm.prank(allocatorService);
-        Staking(STAKING).allocateETH(0, amount);
+        hevm.prank(_allocatorService);
+        _staking.allocateETH(0, amount);
 
         allocatedETHForDeposits = true;
     }
@@ -101,7 +86,7 @@ contract ValidatorHandler {
      * Note: This will spoof the `InitiatorService` role, and call `Staking.initiateValidatorsWithDeposits`.
      */
     function initiateValidatorsWithDeposits(uint256 _seed) public virtual allocatedETH {
-        uint256 amount = Staking(STAKING).allocatedETHForDeposits();
+        uint256 amount = _staking.allocatedETHForDeposits();
         uint256 count = amount / DEPOSIT_AMOUNT;
 
         Staking.ValidatorParams[] memory validators = new Staking.ValidatorParams[](count);
@@ -110,8 +95,8 @@ contract ValidatorHandler {
             validators[i] = _validatorParams(uniqueSeed, DEPOSIT_AMOUNT);
         }
 
-        hevm.prank(initiatorService);
-        Staking(STAKING).initiateValidatorsWithDeposits(validators, depositContract.get_deposit_root());
+        hevm.prank(_initiatorService);
+        _staking.initiateValidatorsWithDeposits(validators, _depositContract.get_deposit_root());
 
         allocatedETHForDeposits = false;
     }
@@ -152,7 +137,7 @@ contract ValidatorHandler {
     /// - withdrawal_credentials[1:12] == b'\x00' * 11
     /// - withdrawal_credentials[12:] == eth1_withdrawal_address
     function _retrieveWithdrawalCredentials() internal view returns (bytes memory withdrawalCredentials) {
-        withdrawalCredentials = abi.encodePacked(ETH1_ADDRESS_WITHDRAWAL_PREFIX, bytes11(0), withdrawalWallet);
+        withdrawalCredentials = abi.encodePacked(ETH1_ADDRESS_WITHDRAWAL_PREFIX, bytes11(0), _withdrawalWallet);
     }
 
     /// @dev Generate a signature (96 bytes)

@@ -14,18 +14,18 @@ import {METH} from "test/fuzzing/echidna/interfaces/ImETH.sol";
 import {UnstakeRequestsManager} from "test/fuzzing/echidna/interfaces/IUnstakeRequestsManager.sol";
 
 contract StakingHandler {
-    Staking staking;
-    METH mETH;
-    UnstakeRequestsManager unstakeRequestsManager;
+    Staking _staking;
+    METH _mETH;
+    UnstakeRequestsManager _unstakeRequestsManager;
 
     /// @dev The unfulfilled unstake requests (basically `Staking.unstakeRequest` but not yet `Staking.claimUnstakeRequest`)
     uint256[] unstakeRequestsIds;
 
     /// @dev Initialize the contracts used in the handler, at the given addresses on mainnet
-    constructor(address _staking, address _mETH, address _unstakeRequestsManager) {
-        staking = Staking(payable(_staking));
-        mETH = METH(_mETH);
-        unstakeRequestsManager = UnstakeRequestsManager(payable(_unstakeRequestsManager));
+    constructor(address _stakingAddress, address _mETHAddress, address _unstakeRequestsManagerAddress) {
+        _staking = Staking(payable(_stakingAddress));
+        _mETH = METH(_mETHAddress);
+        _unstakeRequestsManager = UnstakeRequestsManager(payable(_unstakeRequestsManagerAddress));
     }
 
     /* -------------------------------------------------------------------------- */
@@ -40,9 +40,9 @@ contract StakingHandler {
      */
     function stake(uint256 _amount) public payable virtual {
         bool random = _randomize(_amount);
-        uint256 minMETHAmount = staking.ethToMETH(msg.value);
+        uint256 minMETHAmount = _staking.ethToMETH(msg.value);
 
-        staking.stake{value: msg.value}(random ? _amount : minMETHAmount);
+        _staking.stake{value: msg.value}(random ? _amount : minMETHAmount);
     }
 
     /**
@@ -57,16 +57,16 @@ contract StakingHandler {
      */
     function unstakeRequest(uint256 _seed) public virtual {
         // Calculate the amount of mETH we can unstake (will be burned in `claimUnstakeRequest`)
-        uint128 mETHAmount = uint128(_clampBetween(_seed, 0, mETH.balanceOf(msg.sender)));
+        uint128 mETHAmount = uint128(_clampBetween(_seed, 0, _mETH.balanceOf(msg.sender)));
 
         // Calculate the appropriate amount of ETH to request
         uint256 maximumETHAmount =
-            unstakeRequestsManager.allocatedETHForClaims() - unstakeRequestsManager.latestCumulativeETHRequested();
-        uint128 ETHAmount = uint128(staking.mETHToETH(mETHAmount));
+            _unstakeRequestsManager.allocatedETHForClaims() - _unstakeRequestsManager.latestCumulativeETHRequested();
+        uint128 ETHAmount = uint128(_staking.mETHToETH(mETHAmount));
 
         if (ETHAmount > maximumETHAmount) ETHAmount = uint128(maximumETHAmount);
 
-        uint256 requestId = staking.unstakeRequest(mETHAmount, ETHAmount);
+        uint256 requestId = _staking.unstakeRequest(mETHAmount, ETHAmount);
 
         // Keep track of the unstake request in a mirror
         unstakeRequestsIds.push(requestId);
@@ -82,7 +82,7 @@ contract StakingHandler {
         if (unstakeRequestsIds.length == 0) return;
         uint256 id = unstakeRequestsIds[_seed % unstakeRequestsIds.length];
 
-        staking.claimUnstakeRequest(id);
+        _staking.claimUnstakeRequest(id);
 
         // Delete the request from the mirror
         _deleteUnstakeRequest(_seed % unstakeRequestsIds.length);
