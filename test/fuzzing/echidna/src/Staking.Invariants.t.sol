@@ -73,6 +73,10 @@ contract StakingInvariantsEchidna is StakingHandler, ValidatorHandler {
         _onReceiveETH();
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 INVARIANTS                                 */
+    /* -------------------------------------------------------------------------- */
+
     /// @dev Invariant: try to get the most optimized profit from a transactions sequence
     /// Note: We basically substract the initial ETH and mETH balances from the current ones,
     /// as well as the staked ETH.
