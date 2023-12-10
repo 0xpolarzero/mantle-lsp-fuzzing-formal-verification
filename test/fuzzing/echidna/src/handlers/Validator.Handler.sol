@@ -24,7 +24,8 @@ struct Signature {
 
 contract ValidatorHandler {
     DepositContract _depositContract;
-    Staking _staking;
+    /// @dev It's easier to keep just the address here for inheritance purposes
+    address payable STAKING;
 
     /// @dev The amount deposited when initiating validators
     uint256 constant DEPOSIT_AMOUNT = 32 ether;
@@ -42,9 +43,10 @@ contract ValidatorHandler {
 
     /// @dev Initialize the contracts used in the handler, at the given addresses on mainnet
     constructor(address _stakingAddress, address _depositContractAddress) {
-        _staking = Staking(payable(_stakingAddress));
+        STAKING = payable(_stakingAddress);
         _depositContract = DepositContract(_depositContractAddress);
 
+        Staking _staking = Staking(payable(_stakingAddress));
         // Initialize roles
         _allocatorService = _staking.getRoleMember(_staking.ALLOCATOR_SERVICE_ROLE(), 0);
         _initiatorService = _staking.getRoleMember(_staking.INITIATOR_SERVICE_ROLE(), 0);
@@ -57,7 +59,7 @@ contract ValidatorHandler {
     /* -------------------------------------------------------------------------- */
 
     modifier enoughETHToInitiateValidators() {
-        require(address(_staking).balance >= 32 ether, "ValidatorHandler: not enough ETH to initiate validators");
+        require(STAKING.balance >= 32 ether, "ValidatorHandler: not enough ETH to initiate validators");
         _;
     }
 
@@ -67,10 +69,10 @@ contract ValidatorHandler {
      */
     function allocateETH() public virtual enoughETHToInitiateValidators {
         // Calculate the amount that can be allocated (in 32 ETH chunks)
-        uint256 amount = address(_staking).balance - (address(_staking).balance % DEPOSIT_AMOUNT);
+        uint256 amount = STAKING.balance - (STAKING.balance % DEPOSIT_AMOUNT);
 
         hevm.prank(_allocatorService);
-        _staking.allocateETH(0, amount);
+        Staking(STAKING).allocateETH(0, amount);
 
         allocatedETHForDeposits = true;
     }
@@ -86,7 +88,7 @@ contract ValidatorHandler {
      * Note: This will spoof the `InitiatorService` role, and call `Staking.initiateValidatorsWithDeposits`.
      */
     function initiateValidatorsWithDeposits(uint256 _seed) public virtual allocatedETH {
-        uint256 amount = _staking.allocatedETHForDeposits();
+        uint256 amount = Staking(STAKING).allocatedETHForDeposits();
         uint256 count = amount / DEPOSIT_AMOUNT;
 
         Staking.ValidatorParams[] memory validators = new Staking.ValidatorParams[](count);
@@ -96,7 +98,7 @@ contract ValidatorHandler {
         }
 
         hevm.prank(_initiatorService);
-        _staking.initiateValidatorsWithDeposits(validators, _depositContract.get_deposit_root());
+        Staking(STAKING).initiateValidatorsWithDeposits(validators, _depositContract.get_deposit_root());
 
         allocatedETHForDeposits = false;
     }
