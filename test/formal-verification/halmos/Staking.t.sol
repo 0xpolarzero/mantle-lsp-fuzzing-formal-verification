@@ -12,7 +12,7 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 
-import {StakingBaseHalmos} from "test/formal-verification/halmos/test/Staking.Base.sol";
+import {StakingBaseHalmos} from "test/formal-verification/halmos/Staking.Base.sol";
 
 contract StakingHalmos is StakingBaseHalmos {
     /**

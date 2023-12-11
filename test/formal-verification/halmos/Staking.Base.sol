@@ -22,7 +22,7 @@ import {UnstakeRequestsManager} from "src/UnstakeRequestsManager.sol";
 import {PauserStub} from "test/doubles/PauserStub.sol";
 import {OracleStub} from "test/doubles/OracleStub.sol";
 import {IDepositContract} from "test/doubles/DepositContract.sol";
-import {DepositContractMock} from "test/formal-verification/halmos/src/DepositContract.Mock.sol";
+import {MockDepositContract} from "test/formal-verification/mocks/MockDepositContract.sol";
 
 import {newMETH, newUnstakeRequestsManager} from "test/utils/Deploy.sol";
 import {upgradeToAndCall} from "script/helpers/Proxy.sol";
@@ -66,7 +66,7 @@ contract StakingBaseHalmos is SymTest, Test {
 
         /// @dev From StakingTest
         // Mock deposit contract
-        depositContract = new DepositContractMock();
+        depositContract = new MockDepositContract();
         oracle = new OracleStub();
 
         pauser = new PauserStub();
