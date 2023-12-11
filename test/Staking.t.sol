@@ -325,13 +325,7 @@ contract ExchangeRateTest is StakingTest {
     }
 
     function testETHToMETH1() public {
-        _testETHToMETH({
-            mETHSupply: 100,
-            totalControlled: 200,
-            ethAmount: 100,
-            exchangeAdjustmentRate: 0,
-            wantMETH: 50
-        });
+        _testETHToMETH({mETHSupply: 100, totalControlled: 200, ethAmount: 100, exchangeAdjustmentRate: 0, wantMETH: 50});
     }
 
     function testETHToMETH2() public {
@@ -345,13 +339,7 @@ contract ExchangeRateTest is StakingTest {
     }
 
     function testETHToMETH3() public {
-        _testETHToMETH({
-            mETHSupply: 10,
-            totalControlled: 10000,
-            ethAmount: 100,
-            exchangeAdjustmentRate: 0,
-            wantMETH: 0
-        });
+        _testETHToMETH({mETHSupply: 10, totalControlled: 10000, ethAmount: 100, exchangeAdjustmentRate: 0, wantMETH: 0});
     }
 
     function testETHToMETHInitial(uint128 ethAmount) public {
@@ -408,9 +396,7 @@ contract ExchangeRateRoundTripTest is StakingTest {
     ) internal {
         _setup({mETHSupply: mETHSupply, totalControlled: totalControlled});
         assertEq(
-            staking.ethToMETH(staking.mETHToETH(mETHAmount)),
-            wantAfterRoundtrip,
-            "meth-eth-meth roundtrip mismatch"
+            staking.ethToMETH(staking.mETHToETH(mETHAmount)), wantAfterRoundtrip, "meth-eth-meth roundtrip mismatch"
         );
     }
 
@@ -433,9 +419,7 @@ contract ExchangeRateRoundTripTest is StakingTest {
         uint256 wantAfterRoundtrip
     ) internal {
         _setup({mETHSupply: mETHSupply, totalControlled: totalControlled});
-        assertEq(
-            staking.mETHToETH(staking.ethToMETH(ethAmount)), wantAfterRoundtrip, "eth-meth-eth roundtrip mismatch"
-        );
+        assertEq(staking.mETHToETH(staking.ethToMETH(ethAmount)), wantAfterRoundtrip, "eth-meth-eth roundtrip mismatch");
     }
 
     function testETHRoundTripExact() public {
@@ -813,8 +797,7 @@ contract UnstakeTest is StakingTest {
         staking.unstakeRequest(tt.mETHAmount, tt.minETHAmountUnstaked);
         assertEq(mETH.balanceOf(caller), prevMETHBalanceOfCaller - (shouldFail ? 0 : tt.mETHAmount));
         assertEq(
-            mETH.balanceOf(address(unstakeManager)),
-            prevMETHBalanceOfUnstakeManager + (shouldFail ? 0 : tt.mETHAmount)
+            mETH.balanceOf(address(unstakeManager)), prevMETHBalanceOfUnstakeManager + (shouldFail ? 0 : tt.mETHAmount)
         );
     }
 
@@ -854,8 +837,7 @@ contract UnstakeTest is StakingTest {
 
         assertEq(mETH.balanceOf(caller), prevMETHBalanceOfCaller - (shouldFail ? 0 : tt.mETHAmount));
         assertEq(
-            mETH.balanceOf(address(unstakeManager)),
-            prevMETHBalanceOfUnstakeManager + (shouldFail ? 0 : tt.mETHAmount)
+            mETH.balanceOf(address(unstakeManager)), prevMETHBalanceOfUnstakeManager + (shouldFail ? 0 : tt.mETHAmount)
         );
     }
 
