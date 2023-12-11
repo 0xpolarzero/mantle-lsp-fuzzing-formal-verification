@@ -22,7 +22,7 @@ import {UnstakeRequestsManager} from "src/UnstakeRequestsManager.sol";
 import {PauserStub} from "test/doubles/PauserStub.sol";
 import {OracleStub} from "test/doubles/OracleStub.sol";
 import {IDepositContract} from "test/doubles/DepositContract.sol";
-import {MockDepositContract} from "test/formal-verification/mocks/MockDepositContract.sol";
+import {MockDepositContract} from "test/formal-verification/halmos/mocks/MockDepositContract.sol";
 
 import {newMETH, newUnstakeRequestsManager} from "test/utils/Deploy.sol";
 import {upgradeToAndCall} from "script/helpers/Proxy.sol";
