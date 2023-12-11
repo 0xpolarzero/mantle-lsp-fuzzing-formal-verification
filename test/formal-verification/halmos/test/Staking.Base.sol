@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/// @dev This is a copy of StakingTest deployments, using a mock `DepositContract` instead of the real one,
+/// since Halmos won't support its deployment using the bytecode, neither will it support the merkle tree generation in
+/// the constructor.
+
 import {Test} from "forge-std/Test.sol";
 import {SymTest} from "halmos-cheatcodes/SymTest.sol";
 
@@ -61,6 +65,7 @@ contract StakingBaseHalmos is SymTest, Test {
         vm.warp(2);
 
         /// @dev From StakingTest
+        // Mock deposit contract
         depositContract = new DepositContractMock();
         oracle = new OracleStub();
 
