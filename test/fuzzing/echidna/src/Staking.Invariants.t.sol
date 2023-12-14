@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 /// @dev Run the fuzzing campaign:
-/// echidna test/fuzzing/echidna/src/Staking.Invariants.sol --contract StakingInvariantsEchidna --config test/fuzzing/echidna/echidna-config.yaml
+/// echidna test/fuzzing/echidna/src/Staking.Invariants.t.sol --contract StakingInvariantsEchidna --config test/fuzzing/echidna/echidna-config.yaml
 
 /// @dev This contract inherits from the handler contracts, trusted to make calls to the target contracts.
 /// Here, we basically:
