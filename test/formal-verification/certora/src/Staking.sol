@@ -2,6 +2,8 @@
 pragma solidity ^0.8.20;
 
 /// @dev This is a copy of staking, with resolved dependencies for Certora.
+/// @dev Currently `ValidatorParams` and `Init` are renamed respectively to `_ValidatorParams` and `_Init` to avoid
+/// "redefining variables" with Certora, until I figure out where this conflict happens...
 
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 import {AccessControlEnumerableUpgradeable} from
@@ -109,7 +111,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
 
     /// @notice Payload struct submitted for validator initiation.
     /// @dev See also {initiateValidatorsWithDeposits}.
-    struct ValidatorParams {
+    struct _ValidatorParams {
         uint256 operatorID;
         uint256 depositAmount;
         bytes pubkey;
@@ -240,7 +242,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
     uint256 public maximumMETHSupply;
 
     /// @notice Configuration for contract initialization.
-    struct Init {
+    struct _Init {
         address admin;
         address manager;
         address allocatorService;
@@ -260,7 +262,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
 
     /// @notice Inititalizes the contract.
     /// @dev MUST be called during the contract upgrade to set up the proxies state.
-    function initialize(Init memory init) external initializer {
+    function initialize(_Init memory init) external initializer {
         __AccessControlEnumerable_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, init.admin);
@@ -441,7 +443,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
     /// @dev Cannot initiate the same validator (public key) twice. Since BLS signatures cannot be feasibly verified on
     /// the EVM, the caller must carefully make sure that the sent payloads (public keys + signatures) are correct,
     /// otherwise the sent ETH will be lost.
-    function initiateValidatorsWithDeposits(ValidatorParams[] calldata validators, bytes32 expectedDepositRoot)
+    function initiateValidatorsWithDeposits(_ValidatorParams[] calldata validators, bytes32 expectedDepositRoot)
         external
         onlyRole(INITIATOR_SERVICE_ROLE)
     {
@@ -464,7 +466,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
         // validators and how much we have deposited.
         uint256 amountDeposited = 0;
         for (uint256 i = 0; i < validators.length; ++i) {
-            ValidatorParams calldata validator = validators[i];
+            _ValidatorParams calldata validator = validators[i];
 
             if (usedValidators[validator.pubkey]) {
                 revert PreviouslyUsedValidator();
@@ -502,7 +504,7 @@ contract Staking is Initializable, AccessControlEnumerableUpgradeable, IStaking,
         // Second loop is to send the deposits to the deposit contract. Keeps external calls to the deposit contract
         // separate from state changes.
         for (uint256 i = 0; i < validators.length; ++i) {
-            ValidatorParams calldata validator = validators[i];
+            _ValidatorParams calldata validator = validators[i];
             depositContract.deposit{value: validator.depositAmount}({
                 pubkey: validator.pubkey,
                 withdrawal_credentials: validator.withdrawalCredentials,

@@ -1,19 +1,48 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.20;
 
 /// @dev Copy of Staking
-import "test/formal-verification/certora/src/Staking.sol";
+import {Staking} from "test/formal-verification/certora/src/Staking.sol";
 
 contract StakingHarness is Staking {
-    address public admin;
-    address public manager;
-    address public allocatorService;
-    address public initiatorService;
+    // Declared in Initializer, just for quick access
+    address public ADMIN;
+    address public MANAGER;
+    address public ALLOCATOR_SERVICE;
+    address public INITIATOR_SERVICE;
+    address public WITHDRAWAL_WALLET;
+    address public REQUEST_CANCELLER;
+    address public ORACLE_UPDATER;
+    address public PENDING_RESOLVER;
+    address public PAUSER;
+    address public UNPAUSER;
+    address public FEE_RECIPIENT;
 
-    constructor() Staking() {
-        // call init
-        // or since we already define the mocks we don't need init, just associate addresses to the ones above
-        // or maybe yes to initiate the roles
+    constructor() Staking() {}
+
+    function init_helpers(
+        address _admin,
+        address _manager,
+        address _allocatorService,
+        address _initiatorService,
+        address _withdrawalWallet,
+        address _requestCanceller,
+        address _oracleUpdater,
+        address _pendingResolver,
+        address _pauser,
+        address _unpauser,
+        address _feeRecipient
+    ) external {
+        ADMIN = _admin;
+        MANAGER = _manager;
+        ALLOCATOR_SERVICE = _allocatorService;
+        INITIATOR_SERVICE = _initiatorService;
+        WITHDRAWAL_WALLET = _withdrawalWallet;
+        REQUEST_CANCELLER = _requestCanceller;
+        ORACLE_UPDATER = _oracleUpdater;
+        PENDING_RESOLVER = _pendingResolver;
+        PAUSER = _pauser;
+        UNPAUSER = _unpauser;
+        FEE_RECIPIENT = _feeRecipient;
     }
 }
