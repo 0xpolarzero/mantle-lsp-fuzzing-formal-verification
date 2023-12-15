@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /// @dev This is a copy of staking, with resolved dependencies for Certora.
 /// @dev Currently `ValidatorParams` and `Init` are renamed respectively to `_ValidatorParams` and `_Init` to avoid
-/// "redefining variables" with Certora, until I figure out where this conflict happens...
+/// "redefining variables" with Certora, until I figure out where the problem is.
 
 import {Initializable} from "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 import {AccessControlEnumerableUpgradeable} from

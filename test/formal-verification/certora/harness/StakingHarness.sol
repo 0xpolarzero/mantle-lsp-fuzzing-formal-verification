@@ -5,6 +5,10 @@ pragma solidity ^0.8.20;
 import {Staking} from "test/formal-verification/certora/src/Staking.sol";
 
 contract StakingHarness is Staking {
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
+
     // Declared in Initializer, just for quick access
     address public ADMIN;
     address public MANAGER;
@@ -17,6 +21,10 @@ contract StakingHarness is Staking {
     address public PAUSER;
     address public UNPAUSER;
     address public FEE_RECIPIENT;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                    INIT                                    */
+    /* -------------------------------------------------------------------------- */
 
     constructor() Staking() {}
 
@@ -44,5 +52,13 @@ contract StakingHarness is Staking {
         PAUSER = _pauser;
         UNPAUSER = _unpauser;
         FEE_RECIPIENT = _feeRecipient;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
+
+    function helper_balance(address account) external view returns (uint256) {
+        return account.balance;
     }
 }
